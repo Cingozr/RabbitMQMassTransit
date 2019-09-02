@@ -8,14 +8,14 @@ using Microsoft.Extensions.Configuration;
 using RabbitMQMassTransit.Common;
 using RabbitMQMassTransit.OrderUI.Models;
 using System.Configuration;
+using RabbitMQMassTransit.Messaging;
 
 namespace RabbitMQMassTransit.OrderUI.Controllers
 {
     public class OrderController : Controller
     {
         private readonly ISendEndpoint _bus;
-        private readonly IConfiguration _configuration;
-        public OrderController(IConfiguration configuration)
+        public OrderController()
         {
             var rabbitMqUri = $"rabbitmq://localhost:8081/rabbitmqmasstransit.order";
             var busControl = BusConfigurator.BusConfiguratorInstance.ConfigureBus();
@@ -32,10 +32,13 @@ namespace RabbitMQMassTransit.OrderUI.Controllers
 
         private void CreateOrder(OrderModel orderModel)
         {
-            for (int i = 0; i < 1000; i++)
-            {
-                _bus.Send(orderModel).Wait();
-            }
+            _bus.Send(orderModel).Wait();
+
+            //_bus.Send<IOrderCommand>(new
+            //{
+            //    OrderId = orderModel.OrderId,
+            //    OrderCode = orderModel.OrderCode
+            //});
         }
     }
 }
